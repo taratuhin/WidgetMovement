@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    m_timer->deleteLater();
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -72,9 +73,12 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     {
         auto bt = qobject_cast<QPushButton *>(obj);
         QTimer *tm = bt->findChild<QTimer *>();
-        int interval = tm->interval();
-        interval -= interval * 0.5;
-        tm->setInterval(interval);
+        if (tm)
+        {
+            int interval = tm->interval();
+            interval -= interval * 0.5;
+            tm->setInterval(interval);
+        }
     }
 
     return QWidget::eventFilter(obj, event);
