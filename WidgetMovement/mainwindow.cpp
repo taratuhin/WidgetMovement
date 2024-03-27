@@ -1,7 +1,6 @@
 #include <QTimer>
 #include <QPushButton>
 #include <QRandomGenerator>
-#include <QDateTime>
 #include <QMouseEvent>
 
 #include "mainwindow.h"
@@ -11,28 +10,21 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     resize(300, 600);
-    m_timer = new QTimer();
+    QTimer* m_timer = new QTimer();
     m_timer->setInterval(1000);
-    qsrand(QDateTime::currentMSecsSinceEpoch() / 1000);
 
     connect(m_timer, &QTimer::timeout,
-            [this] {
-                auto x = qrand() % this->width();
+            [this, m_timer] {
                 auto pb = new QPushButton(this);
-
                 pb->resize(20, 20);
+                auto x = QRandomGenerator::global()->bounded(this->width() - pb->width());
 
-                if (x > this->width() - pb->width())
-                {
-                    x = this->width() - pb->width();
-                }
-
-                pb->move(x, qrand() % 100);
+                pb->move(x, QRandomGenerator::global()->bounded(100));
                 pb->installEventFilter(this);
                 pb->show();
 
                 auto tm = new QTimer(pb);
-                tm->setInterval(qrand() % 100 + 50);
+                tm->setInterval(QRandomGenerator::global()->bounded(50, 150));
 
                 connect(tm, &QTimer::timeout,
                         [pb, tm, this] {
@@ -49,19 +41,17 @@ MainWindow::MainWindow(QWidget *parent)
 
                 tm->start();
 
-                connect(pb, &QPushButton::clicked, [pb, tm] {
-                    tm->deleteLater();
+                connect(pb, &QPushButton::clicked, [pb] {
                     pb->deleteLater();
                 });
 
-                m_timer->setInterval(qrand() % 1000);
+                m_timer->setInterval(QRandomGenerator::global()->bounded(1000));
             });
     m_timer->start();
 }
 
 MainWindow::~MainWindow()
 {
-    m_timer->deleteLater();
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -73,6 +63,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     {
         auto bt = qobject_cast<QPushButton *>(obj);
         QTimer *tm = bt->findChild<QTimer *>();
+
         if (tm)
         {
             int interval = tm->interval();
