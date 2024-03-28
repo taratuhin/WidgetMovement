@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
 
 
 class MainWindow : public QMainWindow
@@ -12,7 +13,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-protected:
+private:
+    QTimer* m_timer;
     bool eventFilter(QObject *, QEvent *event);
 };
 #endif // MAINWINDOW_H
