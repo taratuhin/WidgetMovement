@@ -15,6 +15,5 @@ public:
 
 private:
     QTimer* m_timer;
-    bool eventFilter(QObject *, QEvent *event);
 };
 #endif // MAINWINDOW_H

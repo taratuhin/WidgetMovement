@@ -1,6 +1,11 @@
 
 # Changelog
 
+## [0.4] - 2024.03.29
+### [Changed]
+- Переработан механизм ускорения, убрал механизма событий (eventFilter(…), QEvent::HoverEnter) и перешёл на метод underMouse()
+
+
 ## [0.3] - 2024.03.28
 ### [Changed]
 - Вернул исходное состояние класса MainWindow (указатель на таймер в private, QTimer* m_timer)

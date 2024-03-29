@@ -1,7 +1,6 @@
 #include <QTimer>
 #include <QPushButton>
 #include <QRandomGenerator>
-#include <QMouseEvent>
 
 #include "mainwindow.h"
 
@@ -18,16 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
                 auto pb = new QPushButton(this);
                 pb->resize(20, 20);
                 const auto x = QRandomGenerator::global()->bounded(this->width() - pb->width());
-
                 pb->move(x, QRandomGenerator::global()->bounded(100));
-                pb->installEventFilter(this);
                 pb->show();
 
                 auto tm = new QTimer(pb);
                 tm->setInterval(QRandomGenerator::global()->bounded(50, 150));
 
                 connect(tm, &QTimer::timeout,
-                        [pb, this] {
+                        [pb, tm, this] {
                             pb->move(pb->pos() + QPoint(0, 1));
 
                             if(pb->pos().y() > (this->height() - pb->height()))
@@ -35,6 +32,14 @@ MainWindow::MainWindow(QWidget *parent)
                                 this->setStyleSheet("background-color:red;");
                                 this->setWindowTitle("Game over!");
                                 pb->deleteLater();
+                            }
+
+                            if (pb->underMouse())
+                            {
+                                int interval = tm->interval();
+                                interval -= interval * 0.5;
+                                interval < 15 ? interval = 15 : interval;
+                                tm->setInterval(interval);
                             }
                         });
 
@@ -49,25 +54,4 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
-}
-
-bool MainWindow::eventFilter(QObject *obj, QEvent *event)
-{
-    QEvent::Type  type = event->type();
-
-
-    if (type == QEvent::HoverEnter)
-    {
-        auto bt = qobject_cast<QPushButton *>(obj);
-        QTimer *tm = bt->findChild<QTimer *>();
-
-        if (tm)
-        {
-            int interval = tm->interval();
-            interval -= interval * 0.5;
-            tm->setInterval(interval);
-        }
-    }
-
-    return QWidget::eventFilter(obj, event);
 }
